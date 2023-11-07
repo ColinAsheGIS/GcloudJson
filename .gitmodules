@@ -1,0 +1,3 @@
+[submodule "kaffeine"]
+	path = kaffeine
+	url = git@github.com:KoffieLabs/kaffeine.git
