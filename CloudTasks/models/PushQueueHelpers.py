@@ -1,8 +1,6 @@
-from kaffeine import get_project_settings
+from ...base_types import JsonHTTPMethod
 
-from base_types import JsonHTTPMethod
-
-from .PushQueue import JsonAppEngineHttpQueue , JsonHTTPTarget, JsonPathOverride, JsonPushQueueInput, \
+from .PushQueue import JsonAppEngineHttpQueue, JsonHTTPTarget, JsonPathOverride, JsonPushQueueInput, \
     JsonQueryOverride, JsonRateLimits, JsonRetryConfig, JsonUriOverride, OidcToken, Scheme, StackdriverLoggingConfig, \
     UriOverrideEnforceMode, JsonAppEngineRouting
 
@@ -32,7 +30,8 @@ def create_default_uri_override() -> JsonUriOverride:
 async def create_default_oidc_token() -> OidcToken:
     settings = get_project_settings(base_settings=True)
     return OidcToken(
-        service_account_email=f'{settings.current_service}@appspot.gserviceaccount.com',
+        service_account_email=f'{
+            settings.current_service}@appspot.gserviceaccount.com',
         audience="https://www.googleapis.com/auth/cloud-tasks"
     )
 
@@ -52,12 +51,15 @@ async def create_default_http_target() -> JsonHTTPTarget:
 
 
 async def create_default_push_queue_request(queue_name: str) -> JsonPushQueueInput:
-    name = f"projects/kapi-development/locations/us-central1/queues/{queue_name}"
+    # TODO: Replace old names with input vals
+    project_name = "noprojectnameset"
+    name = f"projects/{project_name}/locations/us-central1/queues/{queue_name}"
     http_target = await create_default_http_target()
     rate_limits = JsonRateLimits()
     retry_config = JsonRetryConfig()
     stackdriver_logging_config = StackdriverLoggingConfig()
-    app_engine_http_queue = JsonAppEngineHttpQueue(app_engine_routing_override=JsonAppEngineRouting())
+    app_engine_http_queue = JsonAppEngineHttpQueue(
+        app_engine_routing_override=JsonAppEngineRouting())
     res = JsonPushQueueInput(
         name=name,
         http_target=http_target,

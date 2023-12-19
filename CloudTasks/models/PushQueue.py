@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from pydantic import Field
 
-from base_types import JsonBase, JsonHTTPMethod
+from ...base_types import JsonBase, JsonHTTPMethod
 
 class TypeEnum(Enum):
     type_unspecified = "TYPE_UNSPECIFIED"

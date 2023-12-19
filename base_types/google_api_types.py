@@ -4,13 +4,15 @@ from datetime import datetime
 from enum import Enum
 
 from google.protobuf.timestamp_pb2 import Timestamp
-from pydantic import BaseModel
+from pydantic import BaseModel, BaseSettings
 from pydantic.utils import to_lower_camel
+
 
 def zulu_encode(dt: datetime) -> str:
     temp_stamp = Timestamp()
     temp_stamp.FromDatetime(dt)
     return temp_stamp.ToJsonString()
+
 
 class JsonBase(BaseModel):
 
@@ -25,9 +27,11 @@ class JsonBase(BaseModel):
             datetime: zulu_encode
         }
 
+
 class OidcToken(JsonBase):
     service_account_email: str
     audience: str
+
 
 class JsonHTTPMethod(Enum):
     http_method_unspecified = "HTTP_METHOD_UNSPECIFIED"
@@ -39,3 +43,6 @@ class JsonHTTPMethod(Enum):
     patch = "PATCH"
     options = "OPTIONS"
 
+
+class GCloudSettings(BaseSettings):
+    project_id: str

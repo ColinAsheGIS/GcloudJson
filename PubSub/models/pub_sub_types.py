@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 
 from pydantic import validator
 
-from base_types import JsonBase
+from ...base_types import JsonBase
 
 
 class PolicyVersion(Enum):

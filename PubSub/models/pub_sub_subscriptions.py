@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Dict, List, Optional
 
-from base_types import JsonBase, OidcToken
+from ...base_types import JsonBase, OidcToken
 
 class SubscriptionBase(JsonBase):
     name: str

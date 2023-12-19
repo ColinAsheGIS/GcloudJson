@@ -5,7 +5,7 @@ from enum import Enum
 
 from pydantic import Field
 
-from base_types import JsonBase
+from ...base_types import JsonBase
 
 class SchemaType(Enum):
     type_unspecified = "TYPE_UNSPECIFIED"

@@ -6,7 +6,7 @@ from typing import Protocol
 import httpx
 from httpx import AsyncClient, Request, Response
 
-from CloudTasks import CreateHTTPTaskRequest, JsonPushQueueOutput, create_default_push_queue_request
+from ..models import CreateHTTPTaskRequest, JsonPushQueueOutput, create_default_push_queue_request
 
 
 class SupportsCreateQueue(Protocol):

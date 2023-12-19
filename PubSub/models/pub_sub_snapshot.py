@@ -3,7 +3,7 @@ from datetime import datetime
 
 from typing import List, Optional
 
-from base_types import JsonBase
+from ...base_types import JsonBase
 
 class SnapshotBase(JsonBase):
     name: Optional[str]

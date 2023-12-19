@@ -2,15 +2,13 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import typing
-from typing import Any, Optional, Protocol, Union
+from typing import Any, Optional, Protocol, Union, List
 
 import httpx
 from httpx import AsyncClient, Request, Response
 
-from ...kaffeine import get_oauth_token
-from ...kaffeine.settings import get_project_settings
-
-from PubSub.models.pub_sub_topics import PublishToTopicResponse
+from ..models.pub_sub_topics import PubSubMessageRequest, PublishMessageBody, PublishToTopicResponse
+from ...base_types import JsonBase
 
 class PbSafeProtocol(Protocol):
     def json(
@@ -29,6 +27,14 @@ class PbSafeProtocol(Protocol):
         ) -> str:
         ...
 
+def wrap_message(dev_topic_msg: DevTopicMessage) -> PublishMessageMonad:
+    import base64
+    data = base64.b64encode(bytes(dev_topic_msg.json(by_alias=True), encoding='utf-8'))
+    mm = MessageMonad(data=data)
+    pmm = PublishMessageMonad(messages=[mm])
+    return pmm
+
+
 class PubSubAuth(httpx.Auth):
     def __init__(self, token: str):
         self.token = token
@@ -43,21 +49,25 @@ class SupportsPublishMessage(Protocol):
 
 class IPublisherClient:
     topic_id: str
+    project_id: str
+    location_id: str
     def __init__(self) -> None:
-        settings = get_project_settings(base_settings=True)
-        project_id = settings.current_service # type: ignore
-        location_id = "us-central1"
-        token = get_oauth_token(scopes=['https://www.googleapis.com/auth/pubsub'])
+        token: str = "abstract_token"
         self.client = AsyncClient(
             base_url="https://pubsub.googleapis.com/v1/"
-                     f"projects/{project_id}/locations/{location_id}/topics/{self.topic_id}",
+                     f"projects/{self.project_id}/locations/{self.location_id}/topics/{self.topic_id}",
             auth=PubSubAuth(token),
         )
 
-    async def publish_message(self, message: PbSafeProtocol) -> PublishToTopicResponse:
+    def _wrap_message(self, message: JsonBase) -> str:
+        b64_message = PubSubMessageRequest.from_json_base(message)
+        req_body = PublishMessageBody(messages=[b64_message])
+        return req_body.json(by_alias=True)
+
+    async def publish_message(self, message: JsonBase) -> PublishToTopicResponse:
         res = await self.client.post(
-            url="",
-            content=message.json(by_alias=True)
+            url=":publish",
+            content=self._wrap_message(message)
         )
         assert res.status_code == 200
         message_ids_res = res.json()

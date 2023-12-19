@@ -1,18 +1,16 @@
 from __future__ import annotations
+from abc import abstractmethod
 from collections.abc import Callable
 
 import typing
-from typing import Any, Optional, Protocol, Union
+from typing import Any, List, Optional, Protocol, Union
 
 import httpx
 from httpx import AsyncClient, Request, Response
 
-from ...kaffeine import get_oauth_token
-from ...kaffeine.settings import get_project_settings
-
-from PubSub.models.pub_sub_types import SchemaView
-from PubSub.models.pub_sub_topics import TopicBase
-from PubSub.models.pub_sub_schemas import SchemaInput, SchemaOutput
+from ..models.pub_sub_types import SchemaView
+from ..models.pub_sub_topics import TopicBase
+from ..models.pub_sub_schemas import SchemaInput, SchemaOutput
 
 class PbSafeProtocol(Protocol):
     def json(
@@ -41,15 +39,23 @@ class PubSubAuth(httpx.Auth):
 
 class IPubSubAdmin:
     def __init__(self) -> None:
-        settings = get_project_settings(base_settings=True)
+        settings = self.get_project_settings(base_settings=True)
         project_id = settings.current_service # type: ignore
         location_id = "us-central1"
-        token = get_oauth_token(scopes=['https://www.googleapis.com/auth/pubsub'])
+        token = self.get_oauth_token(scopes=['https://www.googleapis.com/auth/pubsub'])
         self.client = AsyncClient(
             base_url="https://pubsub.googleapis.com/v1/"
                      f"projects/{project_id}/locations/{location_id}/",
             auth=PubSubAuth(token),
         )
+
+    @abstractmethod
+    def get_oauth_token(self, scopes: List[str]) -> str:
+        ...
+
+    @abstractmethod
+    def get_project_settings(self, base_settings: bool) -> Any:
+        ...
 
     async def create_schema(self, schema: SchemaInput, schema_id: str) -> SchemaOutput:
         content = schema.json(by_alias=True)

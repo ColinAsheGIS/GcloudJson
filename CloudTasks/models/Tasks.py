@@ -6,7 +6,7 @@ from typing import Dict, List
 
 from pydantic import validator
 
-from base_types import JsonBase, JsonHTTPMethod
+from ...base_types import JsonBase, JsonHTTPMethod
 
 class View(Enum):
     view_unspecified = "VIEW_UNSPECIFIED"
